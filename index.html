@@ -1,0 +1,173 @@
+<!doctype html><html lang="en"><head>
+<meta charset="utf-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>SENTINEL M//SOC — AI Security Operations Center</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet"/>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#000;--s1:#0d0d0d;--s2:#1a1a1a;--s3:#262626;--ink:#fff;--body:#bbb;--muted:#7e7e7e;--line:#3c3c3c;--r:#e22718;--bl:#0066b1;--bd:#1c69d4;--warn:#f4b400;--ok:#0fa336}
+html{scroll-behavior:smooth}body{background:var(--bg);color:var(--ink);font-family:'Inter',sans-serif;font-weight:300;overflow-x:hidden}
+.stripe{height:3px;display:flex;position:fixed;top:0;left:0;right:0;z-index:100}.stripe span:nth-child(1){flex:1;background:var(--bl)}.stripe span:nth-child(2){flex:1;background:var(--bd)}.stripe span:nth-child(3){flex:1;background:var(--r)}
+nav{position:fixed;top:3px;left:0;right:0;background:rgba(0,0,0,.92);backdrop-filter:blur(20px);border-bottom:1px solid var(--line);padding:0 clamp(16px,5vw,80px);height:56px;display:flex;align-items:center;justify-content:space-between;z-index:99}
+.logo-wrap{display:flex;align-items:center;gap:10px}
+.logo{font-size:14px;font-weight:700;letter-spacing:3px;text-transform:uppercase}
+.logo-tag{font-size:9px;letter-spacing:2px;color:var(--r);font-weight:700;background:rgba(226,39,24,.12);border:1px solid rgba(226,39,24,.25);padding:2px 8px}
+.nav-links{display:flex;align-items:center;gap:4px}
+.nav-links a{color:var(--muted);text-decoration:none;font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;padding:6px 12px;transition:color .15s}.nav-links a:hover{color:var(--ink)}
+.star-btn{background:var(--bl);color:#fff;padding:8px 20px;font-size:10px;font-weight:700;letter-spacing:2px;text-decoration:none;text-transform:uppercase;border:none}
+.hero{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:80px clamp(16px,5vw,80px) 60px;position:relative}
+.hero::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 80% 50% at 50% 40%,rgba(0,102,177,.07) 0%,transparent 70%);pointer-events:none}
+.eyebrow{font-size:10px;letter-spacing:5px;color:var(--bl);font-weight:700;text-transform:uppercase;margin-bottom:24px;display:flex;align-items:center;gap:12px;justify-content:center}
+.eyebrow::before,.eyebrow::after{content:'';height:1px;width:48px;background:var(--line)}
+h1{font-size:clamp(36px,8vw,104px);font-weight:700;line-height:.95;letter-spacing:-4px;text-transform:uppercase;margin-bottom:28px}
+h1 .accent{color:var(--r)}
+.hero-sub{font-size:clamp(13px,1.5vw,17px);color:var(--body);max-width:620px;line-height:1.75;margin:0 auto 44px}
+.ctas{display:flex;gap:12px;flex-wrap:wrap;justify-content:center;margin-bottom:64px}
+.btn{display:inline-flex;align-items:center;gap:8px;padding:14px 30px;font-size:11px;font-weight:700;letter-spacing:2px;text-decoration:none;text-transform:uppercase;transition:all .15s}
+.btn-p{background:var(--bl);color:#fff;box-shadow:0 0 40px rgba(0,102,177,.25)}.btn-p:hover{background:var(--bd);box-shadow:0 0 60px rgba(0,102,177,.45);transform:translateY(-1px)}
+.btn-s{background:transparent;color:var(--ink);border:1px solid var(--line)}.btn-s:hover{border-color:var(--bl);color:var(--bl)}
+.kpi-row{display:flex;gap:0;border:1px solid var(--line);margin-bottom:64px;flex-wrap:wrap}
+.kpi{padding:20px 36px;border-right:1px solid var(--line);background:var(--s1);text-align:center;flex:1;min-width:120px}.kpi:last-child{border-right:none}
+.kn{font-size:40px;font-weight:700;letter-spacing:-2px;line-height:1}.kl{font-size:9px;letter-spacing:3px;color:var(--muted);font-weight:700;text-transform:uppercase;margin-top:6px}
+.term{width:min(800px,92vw);background:var(--s1);border:1px solid var(--line);box-shadow:0 40px 100px rgba(0,0,0,.7);text-align:left}
+.tbar{background:var(--s2);padding:10px 16px;display:flex;align-items:center;gap:8px;border-bottom:1px solid var(--line)}
+.d{width:12px;height:12px;border-radius:50%}.dr{background:#e22718}.dy{background:#f4b400}.dg{background:#0fa336}
+.tt{margin:0 auto;font-size:10px;color:var(--muted);font-family:'JetBrains Mono',monospace;letter-spacing:2px}
+.tbody{padding:20px;font-family:'JetBrains Mono',monospace;font-size:12px;line-height:2}
+.p{color:var(--bl)}.ok{color:var(--ok)}.w{color:var(--warn)}.dim{color:#7e7e7e}
+section{padding:80px clamp(16px,5vw,80px)}
+.sec-eye{font-size:9px;letter-spacing:4px;color:var(--bl);font-weight:700;text-transform:uppercase;margin-bottom:12px;text-align:center}
+.sec-title{font-size:clamp(24px,4vw,56px);font-weight:700;letter-spacing:-2px;text-transform:uppercase;text-align:center;margin-bottom:48px}
+.feat-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:1px;background:var(--line)}
+.feat{background:var(--s1);padding:28px;transition:background .15s}.feat:hover{background:var(--s2)}
+.fi{font-size:26px;margin-bottom:14px}.ft{font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;margin-bottom:8px;color:var(--ink)}.fd{font-size:12px;color:var(--body);line-height:1.7}
+.tags{display:flex;flex-wrap:wrap;gap:4px;margin-top:12px}.tag{font-size:9px;font-weight:700;letter-spacing:1px;padding:2px 7px;background:var(--s3);color:var(--muted);text-transform:uppercase}
+.tag.b{background:rgba(0,102,177,.15);color:var(--bl)}.tag.r{background:rgba(226,39,24,.15);color:var(--r)}.tag.g{background:rgba(15,163,54,.15);color:var(--ok)}
+.ai-split{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--line)}
+.ai-l,.ai-r{background:var(--s1);padding:40px}
+.stack{border-top:1px solid var(--line)}.stack-row{display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid var(--s3)}
+.sk{font-size:9px;font-weight:700;letter-spacing:2px;color:var(--muted);text-transform:uppercase;width:90px;flex-shrink:0}.sv{font-size:12px;color:var(--body)}
+.code{background:#0d0d0d;border:1px solid var(--line);padding:20px;font-family:'JetBrains Mono',monospace;font-size:12px;line-height:1.9;color:var(--ok);overflow-x:auto}
+footer{padding:40px clamp(16px,5vw,80px);border-top:1px solid var(--line);display:flex;flex-wrap:wrap;gap:20px;justify-content:space-between;align-items:center}
+.fl a{color:var(--muted);text-decoration:none;font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;margin-right:16px;transition:color .15s}.fl a:hover{color:var(--ink)}
+@media(max-width:700px){.kpi-row{flex-direction:column}.ai-split{grid-template-columns:1fr}.nav-links a:not(.star-btn){display:none}h1{letter-spacing:-2px}}
+</style>
+</head>
+<body>
+<div class="stripe"><span></span><span></span><span></span></div>
+<nav>
+  <div class="logo-wrap"><span class="logo">SENTINEL</span><span class="logo-tag">M//SOC</span></div>
+  <div class="nav-links">
+    <a href="#features">FEATURES</a><a href="#stack">STACK</a>
+    <a href="https://github.com/anshul2414/sentinel-soc" target="_blank">GITHUB</a>
+    <a href="https://github.com/anshul2414/sentinel-soc" target="_blank" class="star-btn">⭐ STAR</a>
+  </div>
+</nav>
+
+<section class="hero">
+  <p class="eyebrow">AI-POWERED SECURITY OPERATIONS CENTER</p>
+  <h1>ENGINEERED<br/>FOR REAL-TIME<br/><span class="accent">DEFENSE.</span></h1>
+  <p class="hero-sub">SENTINEL delivers AI-augmented threat detection, GPT-4o incident analysis, SIEM ingestion, IOC enrichment, MITRE ATT&CK mapping, and automated playbook execution — all in one precision-engineered SOC platform.</p>
+  <div class="ctas">
+    <a class="btn btn-p" href="https://github.com/anshul2414/sentinel-soc">🐙 VIEW ON GITHUB</a>
+    <a class="btn btn-s" href="#features">EXPLORE FEATURES</a>
+  </div>
+  <div class="kpi-row">
+    <div class="kpi"><div class="kn" style="color:var(--r)">8</div><div class="kl">SOC Modules</div></div>
+    <div class="kpi"><div class="kn" style="color:var(--warn)">30+</div><div class="kl">API Endpoints</div></div>
+    <div class="kpi"><div class="kn" style="color:var(--bd)">GPT-4o</div><div class="kl">AI Engine</div></div>
+    <div class="kpi"><div class="kn" style="color:var(--ok)">100%</div><div class="kl">Self-Hosted</div></div>
+  </div>
+  <div class="term">
+    <div class="tbar"><div class="d dr"></div><div class="d dy"></div><div class="d dg"></div><span class="tt">SENTINEL M//SOC — OPERATIONAL</span></div>
+    <div class="tbody">
+      <div><span class="p">$</span> git clone https://github.com/anshul2414/sentinel-soc.git &amp;&amp; cd sentinel-soc</div>
+      <div><span class="ok">&#10004; Cloning SENTINEL SOC platform...</span></div>
+      <div><span class="p">$</span> pip install -r requirements.txt &amp;&amp; python app.py</div>
+      <div><span class="w">&#8594; Initializing SENTINEL AI engine...</span></div>
+      <div><span class="w">&#8594; Loading threat intelligence feeds (8 IOCs, 8 assets)...</span></div>
+      <div><span class="w">&#8594; Seeding 15 alerts · 3 incidents · 4 playbooks...</span></div>
+      <div><span class="w">&#8594; Starting real-time alert simulator...</span></div>
+      <div><span class="ok">&#10022; SENTINEL M//SOC v1.0 — OPERATIONAL</span></div>
+      <div><span class="ok">&#10004; http://localhost:5000</span></div>
+      <div><span class="dim"># Set OPENAI_API_KEY for live GPT-4o · Demo mode works without it</span></div>
+    </div>
+  </div>
+</section>
+
+<section id="features" style="background:var(--s1);border-top:1px solid var(--line);border-bottom:1px solid var(--line);padding:80px clamp(16px,5vw,80px)">
+  <div class="sec-eye">PLATFORM CAPABILITIES</div>
+  <div class="sec-title">8 MODULES. ONE PLATFORM.</div>
+  <div class="feat-grid">
+    <div class="feat"><div class="fi">🚨</div><div class="ft">Alert Queue</div><div class="fd">Real-time ingestion, severity triage, MITRE mapping. Click any alert for instant GPT-4o analysis.</div><div class="tags"><span class="tag b">REAL-TIME</span><span class="tag r">CRITICAL PATH</span></div></div>
+    <div class="feat"><div class="fi">🤖</div><div class="ft">AI Analyst</div><div class="fd">GPT-4o SOC assistant. Natural language queries, IOC extraction, KQL/SPL generation, MITRE mapping.</div><div class="tags"><span class="tag g">GPT-4o</span><span class="tag b">NLP</span><span class="tag">IOC EXTRACT</span></div></div>
+    <div class="feat"><div class="fi">📋</div><div class="ft">Incident Command</div><div class="fd">Full lifecycle — create, assign, escalate, close. Linked alerts, assets, AI summaries, playbooks.</div><div class="tags"><span class="tag">LIFECYCLE</span><span class="tag b">AI SUMMARY</span></div></div>
+    <div class="feat"><div class="fi">🧠</div><div class="ft">Threat Intel</div><div class="fd">IOC database with threat actor attribution, TLP classification, campaign tracking, confidence scoring.</div><div class="tags"><span class="tag r">MISP</span><span class="tag">OTX</span><span class="tag b">TLP</span></div></div>
+    <div class="feat"><div class="fi">🏢</div><div class="ft">Asset Registry</div><div class="fd">Full asset inventory with real-time risk scoring, criticality index, and vulnerability correlation.</div><div class="tags"><span class="tag">CMDB</span><span class="tag b">RISK SCORE</span></div></div>
+    <div class="feat"><div class="fi">🗺️</div><div class="ft">MITRE ATT&amp;CK</div><div class="fd">Live tactic heat map. Coverage analysis, detection gap identification, adversary TTP profiling.</div><div class="tags"><span class="tag b">ATT&amp;CK</span><span class="tag g">GAP ANALYSIS</span></div></div>
+    <div class="feat"><div class="fi">📚</div><div class="ft">Playbook Library</div><div class="fd">Pre-built ransomware, phishing, brute force, exfil playbooks. AI generates custom runbooks on demand.</div><div class="tags"><span class="tag g">AUTOMATED</span><span class="tag b">AI GENERATED</span></div></div>
+    <div class="feat"><div class="fi">📊</div><div class="ft">SIEM Integration</div><div class="fd">REST API log ingestion. Real-time correlation, NL log queries. Connect any source with one POST.</div><div class="tags"><span class="tag b">REST API</span><span class="tag g">STREAMING</span></div></div>
+  </div>
+</section>
+
+<section class="ai-split" style="padding:0">
+  <div class="ai-l">
+    <div style="font-size:9px;letter-spacing:4px;color:var(--bl);font-weight:700;text-transform:uppercase;margin-bottom:12px">AI CAPABILITIES</div>
+    <div style="font-size:clamp(20px,3vw,40px);font-weight:700;letter-spacing:-1px;text-transform:uppercase;margin-bottom:28px">SENTINEL AI<br/>ANALYST</div>
+    <div style="border-top:1px solid var(--line)">
+      <div style="display:flex;gap:12px;padding:14px 0;border-bottom:1px solid var(--s3)"><div style="font-size:20px">🔍</div><div><div style="font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;margin-bottom:3px">Threat Analysis</div><div style="font-size:11px;color:var(--body);line-height:1.6">Instant GPT-4o analysis: severity, kill chain, MITRE mapping, ranked remediation.</div></div></div>
+      <div style="display:flex;gap:12px;padding:14px 0;border-bottom:1px solid var(--s3)"><div style="font-size:20px">💬</div><div><div style="font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;margin-bottom:3px">SOC Chatbot</div><div style="font-size:11px;color:var(--body);line-height:1.6">Natural language: "Hunt lateral movement", "Generate KQL for brute force".</div></div></div>
+      <div style="display:flex;gap:12px;padding:14px 0;border-bottom:1px solid var(--s3)"><div style="font-size:20px">🧬</div><div><div style="font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;margin-bottom:3px">IOC Extraction</div><div style="font-size:11px;color:var(--body);line-height:1.6">Paste raw logs — AI extracts IPs, domains, hashes, URLs automatically.</div></div></div>
+      <div style="display:flex;gap:12px;padding:14px 0"><div style="font-size:20px">📋</div><div><div style="font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;margin-bottom:3px">Playbook Gen</div><div style="font-size:11px;color:var(--body);line-height:1.6">AI generates custom response playbooks for any incident type on demand.</div></div></div>
+    </div>
+  </div>
+  <div class="ai-r">
+    <div style="font-size:9px;letter-spacing:3px;color:var(--bl);font-weight:700;text-transform:uppercase;margin-bottom:12px">QUICK START</div>
+    <div class="code"><span style="color:#7e7e7e"># Python</span>
+git clone https://github.com/anshul2414/sentinel-soc.git
+cd sentinel-soc
+pip install -r requirements.txt
+python app.py
+<span style="color:#7e7e7e"># → http://localhost:5000</span>
+
+<span style="color:#7e7e7e"># Docker</span>
+docker-compose up -d
+<span style="color:#7e7e7e"># → http://localhost:8080</span>
+
+<span style="color:#7e7e7e"># With AI (optional)</span>
+export OPENAI_API_KEY=sk-proj-...
+<span style="color:#7e7e7e"># Full GPT-4o enabled</span>
+
+<span style="color:#7e7e7e"># Ingest logs via REST</span>
+curl -X POST localhost:5000/api/siem/ingest \
+  -d '{"source":"fw","message":"blocked 185.220.101.45"}'</div>
+    <div style="margin-top:14px;padding:14px;background:rgba(0,102,177,.07);border:1px solid rgba(0,102,177,.2);font-size:11px;color:var(--body);line-height:1.6">
+      <strong style="color:var(--bl);font-size:9px;letter-spacing:2px;display:block;margin-bottom:4px">DEMO MODE</strong>
+      Works without an API key. 15 seeded alerts, 8 assets, 8 IOCs, 4 playbooks. Set OPENAI_API_KEY for live GPT-4o.
+    </div>
+  </div>
+</section>
+
+<section id="stack" style="background:var(--s1);border-top:1px solid var(--line);padding:80px clamp(16px,5vw,80px)">
+  <div class="sec-eye">TECHNICAL ARCHITECTURE</div>
+  <div class="sec-title">PRECISION ENGINEERED.</div>
+  <div style="max-width:700px;margin:0 auto" class="stack">
+    <div class="stack-row"><span class="sk">Backend</span><span class="sv">Python 3.12 · Flask 3.0 · Flask-SocketIO · Gunicorn</span></div>
+    <div class="stack-row"><span class="sk">AI Engine</span><span class="sv">OpenAI GPT-4o · Custom NLP pipeline · IOC regex extraction</span></div>
+    <div class="stack-row"><span class="sk">Database</span><span class="sv">SQLite (dev) · PostgreSQL-ready · SQLAlchemy ORM-compatible</span></div>
+    <div class="stack-row"><span class="sk">Real-time</span><span class="sv">WebSocket (Socket.IO) · Background alert simulator</span></div>
+    <div class="stack-row"><span class="sk">Frontend</span><span class="sv">Vanilla JS · Chart.js · BMW M Design System (no deps)</span></div>
+    <div class="stack-row"><span class="sk">Container</span><span class="sv">Docker · Docker Compose · Eventlet workers</span></div>
+    <div class="stack-row"><span class="sk">Integrations</span><span class="sv">MISP · OpenCTI · Splunk · Elastic · Wazuh · Any REST source</span></div>
+  </div>
+</section>
+
+<footer>
+  <div style="display:flex;align-items:center;gap:10px"><span style="font-size:13px;font-weight:700;letter-spacing:3px;text-transform:uppercase">SENTINEL</span><span style="font-size:9px;letter-spacing:2px;color:var(--muted);font-weight:700">M//SOC · v1.0 · MIT</span></div>
+  <div class="fl">
+    <a href="https://github.com/anshul2414/sentinel-soc" target="_blank">GITHUB</a>
+    <a href="https://linkedin.com/in/anshul-9800a3275" target="_blank">LINKEDIN</a>
+    <a href="https://tryhackme.com/p/anshul28054" target="_blank">TRYHACKME</a>
+  </div>
+  <p style="font-size:10px;color:var(--muted)">Built by Anshul · Authorized use only · © 2024</p>
+</footer>
+</body></html>
