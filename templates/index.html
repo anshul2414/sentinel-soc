@@ -1,0 +1,425 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>SENTINEL M//SOC — AI Security Operations Center</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;700&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="/static/css/styles.css"/>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+</head>
+<body>
+<div class="m-stripe"><span></span><span></span><span></span></div>
+<aside class="rail">
+  <div class="brand"><b>SENTINEL</b><small>M//SOC</small></div>
+  <nav>
+    <a class="active" data-section="overview">COMMAND</a>
+    <a data-section="alerts">ALERTS</a>
+    <a data-section="incidents">INCIDENTS</a>
+    <a data-section="ai">AI ANALYST</a>
+    <a data-section="intel">THREAT INTEL</a>
+    <a data-section="assets">ASSETS</a>
+    <a data-section="playbooks">PLAYBOOKS</a>
+    <a data-section="siem">SIEM</a>
+  </nav>
+  <div class="rail-foot"><span class="dot"></span><span style="font-size:9px;letter-spacing:2px;color:#7e7e7e;font-weight:700">OPERATIONAL</span></div>
+</aside>
+
+<main id="main">
+  <!-- OVERVIEW SECTION -->
+  <section id="s-overview">
+    <header class="hero">
+      <div>
+        <p class="eyebrow">AI-POWERED SECURITY OPERATIONS CENTER</p>
+        <h1>ENGINEERED FOR<br/>REAL-TIME DEFENSE.</h1>
+        <p class="sub">SENTINEL delivers AI-augmented threat detection, instant incident response, SIEM ingestion, IOC enrichment, MITRE ATT&amp;CK mapping, and automated playbook execution — all in one precision-engineered SOC platform.</p>
+      </div>
+      <div class="status">
+        <span class="live-tag"><span class="live-dot"></span>LIVE</span>
+        <strong id="health">NOMINAL</strong>
+      </div>
+    </header>
+
+    <section class="kpis" id="kpis"></section>
+
+    <div class="grid two">
+      <div class="panel">
+        <div class="panel-head"><h2>THREAT VELOCITY</h2><span class="live-tag"><span class="live-dot"></span>LIVE · 24H</span></div>
+        <div style="height:220px"><canvas id="threatChart"></canvas></div>
+      </div>
+      <div class="panel ai">
+        <div class="panel-head"><h2>SENTINEL AI COPILOT</h2><span>GPT-4o · READY</span></div>
+        <div id="chat" class="chat"></div>
+        <div class="ask">
+          <input id="ask" placeholder="Hunt lateral movement · Generate KQL · Analyze IOC · Explain ransomware..."/>
+          <button onclick="askAI()">ASK AI</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="grid two">
+      <div class="panel">
+        <div class="panel-head"><h2>ACTIVE ALERT QUEUE</h2><span id="alertCount" class="live-tag"><span class="live-dot"></span>0 OPEN</span></div>
+        <div id="alerts"></div>
+      </div>
+      <div class="panel">
+        <div class="panel-head"><h2>INCIDENT COMMAND</h2><span>OPEN CASES</span></div>
+        <div id="incidents" style="overflow-y:auto;max-height:320px"></div>
+      </div>
+    </div>
+
+    <div class="grid three">
+      <div class="panel">
+        <div class="panel-head"><h2>ASSET RISK REGISTRY</h2><span>CRITICALITY INDEX</span></div>
+        <div id="assets"></div>
+      </div>
+      <div class="panel">
+        <div class="panel-head"><h2>MITRE ATT&amp;CK COVERAGE</h2><span>ACTIVE TACTICS</span></div>
+        <div id="mitre"></div>
+      </div>
+      <div class="panel">
+        <div class="panel-head"><h2>IOC INTELLIGENCE</h2><span>THREAT FEEDS</span></div>
+        <div id="iocs"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ALERTS SECTION (hidden by default) -->
+  <section id="s-alerts" style="display:none">
+    <header class="hero">
+      <div><p class="eyebrow">ALERT MANAGEMENT</p><h1>FULL ALERT QUEUE</h1><p class="sub">All active, investigating, and resolved alerts. Click any row for AI-powered triage analysis and recommended actions.</p></div>
+      <div class="status"><span class="live-tag"><span class="live-dot"></span>LIVE</span><strong id="alertTotal">0</strong></div>
+    </header>
+    <div class="panel" style="min-height:0">
+      <div class="panel-head">
+        <h2>ALERT QUEUE</h2>
+        <div style="display:flex;gap:8px">
+          <select id="sevFilter" onchange="filterAlerts()" style="background:#262626;border:1px solid #3c3c3c;color:#bbb;padding:4px 8px;font-size:10px;font-weight:700;letter-spacing:1px">
+            <option value="">ALL SEVERITY</option>
+            <option>CRITICAL</option><option>HIGH</option><option>MEDIUM</option><option>LOW</option>
+          </select>
+          <select id="statFilter" onchange="filterAlerts()" style="background:#262626;border:1px solid #3c3c3c;color:#bbb;padding:4px 8px;font-size:10px;font-weight:700;letter-spacing:1px">
+            <option value="">ALL STATUS</option>
+            <option>OPEN</option><option>INVESTIGATING</option><option>RESOLVED</option>
+          </select>
+          <input id="alertSearch" oninput="filterAlerts()" placeholder="Search..." style="background:#262626;border:1px solid #3c3c3c;color:#bbb;padding:4px 8px;font-size:11px;width:140px"/>
+        </div>
+      </div>
+      <div id="alertsFull"></div>
+    </div>
+    <div id="alertDetail" class="panel" style="display:none;margin-top:1px">
+      <div class="panel-head"><h2>AI THREAT ANALYSIS</h2><button onclick="$('#alertDetail').style.display='none'" style="background:none;border:1px solid #3c3c3c;color:#7e7e7e;padding:4px 12px;cursor:pointer;font-size:9px;letter-spacing:2px;font-weight:700">CLOSE</button></div>
+      <div id="alertAI" style="font-size:12px;color:#bbb;line-height:1.8"></div>
+    </div>
+  </section>
+
+  <!-- INCIDENTS -->
+  <section id="s-incidents" style="display:none">
+    <header class="hero">
+      <div><p class="eyebrow">INCIDENT MANAGEMENT</p><h1>INCIDENT COMMAND</h1><p class="sub">Create, triage, and manage security incidents with AI-powered analysis, automated playbooks, and SLA tracking.</p></div>
+      <div><button onclick="openCreateIncident()" style="background:var(--bl);color:#fff;border:none;padding:12px 24px;font-size:10px;font-weight:700;letter-spacing:2px;cursor:pointer;text-transform:uppercase;margin-top:8px">+ CREATE INCIDENT</button></div>
+    </header>
+    <div class="panel"><div class="panel-head"><h2>ALL INCIDENTS</h2></div><div id="incidentsFull"></div></div>
+  </section>
+
+  <!-- AI ANALYST -->
+  <section id="s-ai" style="display:none">
+    <header class="hero">
+      <div><p class="eyebrow">AI-POWERED THREAT ANALYSIS</p><h1>SENTINEL AI ANALYST</h1><p class="sub">GPT-4o powered SOC assistant. Ask questions in natural language. Generate threat hunts, IOC extraction, MITRE mapping, playbooks, and Splunk/KQL queries instantly.</p></div>
+      <div class="status"><span>MODEL</span><strong>GPT-4o</strong></div>
+    </header>
+    <div class="grid two">
+      <div class="panel" style="min-height:500px;display:flex;flex-direction:column">
+        <div class="panel-head"><h2>AI CONVERSATION</h2><button onclick="clearChat()" style="background:none;border:1px solid #3c3c3c;color:#7e7e7e;padding:4px 12px;font-size:9px;letter-spacing:2px;font-weight:700;cursor:pointer">CLEAR</button></div>
+        <div id="chat2" class="chat" style="height:380px"></div>
+        <div class="ask" style="margin-top:auto">
+          <input id="ask2" placeholder="Write a KQL query for lateral movement · Explain T1486 · Hunt PowerShell LOL · Analyze IP 185.220.101.45"/>
+          <button onclick="askAI2()">ANALYZE</button>
+        </div>
+      </div>
+      <div class="panel">
+        <div class="panel-head"><h2>IOC EXTRACTOR</h2><span>PASTE RAW LOG</span></div>
+        <textarea id="iocInput" placeholder="Paste raw log, email, or report text here — AI will extract all IOCs..." style="width:100%;height:160px;background:#1a1a1a;border:1px solid #3c3c3c;color:#bbb;padding:12px;font-size:11px;font-family:monospace;resize:vertical;margin-bottom:8px"></textarea>
+        <button onclick="extractIOCs()" style="background:var(--bl);color:#fff;border:none;padding:8px 20px;font-size:10px;font-weight:700;letter-spacing:2px;cursor:pointer;text-transform:uppercase;margin-bottom:16px">EXTRACT IOCs</button>
+        <div id="iocExtracted"></div>
+        <div class="panel-head" style="margin-top:16px"><h2>QUICK PLAYBOOKS</h2></div>
+        <div id="quickPlaybooks"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- THREAT INTEL -->
+  <section id="s-intel" style="display:none">
+    <header class="hero">
+      <div><p class="eyebrow">THREAT INTELLIGENCE</p><h1>IOC DATABASE &amp; FEEDS</h1><p class="sub">Aggregated indicators of compromise from premium threat feeds. Enriched with threat actor attribution, MITRE mapping, and confidence scoring.</p></div>
+    </header>
+    <div class="panel"><div class="panel-head"><h2>IOC DATABASE</h2><span id="iocTotal">0 INDICATORS</span></div><div id="iocTable"></div></div>
+  </section>
+
+  <!-- ASSETS -->
+  <section id="s-assets" style="display:none">
+    <header class="hero">
+      <div><p class="eyebrow">ASSET MANAGEMENT</p><h1>ASSET RISK REGISTRY</h1><p class="sub">Complete inventory of monitored assets with real-time risk scoring, criticality classification, and vulnerability tracking.</p></div>
+    </header>
+    <div class="panel"><div class="panel-head"><h2>ASSET INVENTORY</h2></div><div id="assetTable"></div></div>
+  </section>
+
+  <!-- PLAYBOOKS -->
+  <section id="s-playbooks" style="display:none">
+    <header class="hero">
+      <div><p class="eyebrow">RESPONSE AUTOMATION</p><h1>PLAYBOOK LIBRARY</h1><p class="sub">Pre-built and AI-generated incident response playbooks. Trigger automated containment, analysis, and recovery workflows.</p></div>
+    </header>
+    <div id="playbookCards" style="display:grid;grid-template-columns:1fr 1fr;gap:1px;background:#3c3c3c"></div>
+  </section>
+
+  <!-- SIEM -->
+  <section id="s-siem" style="display:none">
+    <header class="hero">
+      <div><p class="eyebrow">SIEM INTEGRATION</p><h1>LOG STREAM &amp; ANALYSIS</h1><p class="sub">Real-time log ingestion and correlation. Query, parse, and analyze security events across all connected data sources.</p></div>
+    </header>
+    <div class="grid two">
+      <div class="panel">
+        <div class="panel-head"><h2>LOG QUERY</h2><span>SPL / KQL / NATURAL LANGUAGE</span></div>
+        <div class="ask" style="margin-bottom:12px">
+          <input id="siemQuery" placeholder="failed logins last 1h · suspicious powershell · c2 traffic..."/>
+          <button onclick="runSIEMQuery()" style="background:var(--bl);color:#fff;border:none;padding:8px 20px;font-size:10px;font-weight:700;letter-spacing:2px;cursor:pointer;text-transform:uppercase">RUN</button>
+        </div>
+        <div id="siemResults" style="font-family:monospace;font-size:11px;color:#0fa336;background:#0d0d0d;padding:12px;min-height:160px;max-height:300px;overflow-y:auto"></div>
+      </div>
+      <div class="panel">
+        <div class="panel-head"><h2>LOG INGEST</h2><span>REST API ENDPOINT</span></div>
+        <div style="font-size:11px;color:#bbb;line-height:2;font-family:monospace;background:#0d0d0d;padding:16px;margin-bottom:12px">
+          POST /api/siem/ingest<br/>
+          Content-Type: application/json<br/><br/>
+          {"source":"firewall","event_type":"blocked",<br/>
+           "src_ip":"185.220.101.45","dst_ip":"10.0.1.10",<br/>
+           "message":"Connection blocked — threat detected"}
+        </div>
+        <button onclick="testIngest()" style="background:var(--s3);color:var(--ink);border:1px solid #3c3c3c;padding:8px 20px;font-size:10px;font-weight:700;letter-spacing:2px;cursor:pointer;text-transform:uppercase">TEST INGEST</button>
+        <div id="ingestResult" style="margin-top:10px;font-size:11px;color:#0fa336"></div>
+      </div>
+    </div>
+  </section>
+</main>
+<script src="/static/js/app.js"></script>
+<script>
+// ── Section Router ──────────────────────────────────────────────────────────
+const sections = ['overview','alerts','incidents','ai','intel','assets','playbooks','siem'];
+document.querySelectorAll('.rail nav a').forEach(a=>{
+  a.onclick=()=>{
+    const sec = a.dataset.section;
+    document.querySelectorAll('.rail nav a').forEach(x=>x.classList.remove('active'));
+    a.classList.add('active');
+    sections.forEach(s=>{
+      document.getElementById('s-'+s).style.display = s===sec?'flex':'none';
+      document.getElementById('s-'+s).style.flexDirection = 'column';
+      document.getElementById('s-'+s).style.gap = '20px';
+    });
+    if(sec==='alerts') loadAlertsFull();
+    if(sec==='incidents') loadIncidentsFull();
+    if(sec==='intel') loadIOCTable();
+    if(sec==='assets') loadAssetTable();
+    if(sec==='playbooks') loadPlaybooks();
+    if(sec==='ai') loadQuickPlaybooks();
+  };
+});
+// Default overview visible
+document.getElementById('s-overview').style.cssText='display:flex;flex-direction:column;gap:20px';
+
+// ── Full Alert Table ─────────────────────────────────────────────────────────
+let allAlerts = [];
+async function loadAlertsFull(){
+  allAlerts = await fetch('/api/alerts?limit=100').then(r=>r.json()).catch(()=>[]);
+  renderAlertsFull(allAlerts);
+  document.getElementById('alertTotal').textContent = allAlerts.filter(a=>a.status==='OPEN').length;
+}
+function renderAlertsFull(data){
+  document.getElementById('alertsFull').innerHTML = `<div class="table"><table>
+    <thead><tr><th>SEV</th><th>ID</th><th>TITLE</th><th>SOURCE IP</th><th>DEST IP</th><th>TACTIC</th><th>TECHNIQUE</th><th>STATUS</th><th>CREATED</th></tr></thead>
+    <tbody>${data.map(a=>`<tr onclick="showAlertDetail('${a.id}')" style="cursor:pointer">
+      <td><span class="badge ${a.severity}">${a.severity}</span></td>
+      <td><span style="font-family:monospace;font-size:10px;color:#7e7e7e">${a.id.slice(0,8)}</span></td>
+      <td><span class="title">${a.title}</span></td>
+      <td><span class="ip">${a.source_ip||'—'}</span></td>
+      <td><span class="ip">${a.dest_ip||'—'}</span></td>
+      <td><span style="font-size:10px;color:#7e7e7e">${a.mitre_tactic||'—'}</span></td>
+      <td><span style="font-family:monospace;font-size:10px;color:#0066b1">${a.mitre_technique||'—'}</span></td>
+      <td><span class="badge ${a.status}">${a.status}</span></td>
+      <td><span style="font-size:10px;color:#7e7e7e">${(a.created_at||'').slice(0,16)}</span></td>
+    </tr>`).join('')}</tbody>
+  </table></div>`;
+}
+function filterAlerts(){
+  const sev = document.getElementById('sevFilter').value;
+  const stat = document.getElementById('statFilter').value;
+  const q = document.getElementById('alertSearch').value.toLowerCase();
+  renderAlertsFull(allAlerts.filter(a=>
+    (!sev||a.severity===sev) && (!stat||a.status===stat) &&
+    (!q||a.title.toLowerCase().includes(q)||((a.source_ip||'').includes(q)))
+  ));
+}
+async function showAlertDetail(id){
+  const el = document.getElementById('alertDetail');
+  const aiEl = document.getElementById('alertAI');
+  el.style.display='block';
+  aiEl.innerHTML='<span style="color:#7e7e7e">Analyzing with AI...</span>';
+  const alert = allAlerts.find(a=>a.id===id)||{};
+  const res = await fetch('/api/ai/analyze',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({alert_id:id,alert})}).then(r=>r.json()).catch(()=>null);
+  if(res){
+    const actions = res.recommended_actions||{};
+    aiEl.innerHTML = `
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:1px;background:#3c3c3c;margin-bottom:12px">
+        <div style="background:#1a1a1a;padding:12px"><div style="font-size:9px;letter-spacing:2px;color:#7e7e7e;font-weight:700;margin-bottom:6px">RISK SCORE</div><div style="font-size:36px;font-weight:700;color:${res.risk_score>75?'#e22718':'#f4b400'}">${res.risk_score||'—'}</div></div>
+        <div style="background:#1a1a1a;padding:12px"><div style="font-size:9px;letter-spacing:2px;color:#7e7e7e;font-weight:700;margin-bottom:6px">TACTIC</div><div style="font-size:14px;font-weight:700;color:#0066b1">${(res.attack_chain?.technique)||'N/A'}</div></div>
+        <div style="background:#1a1a1a;padding:12px"><div style="font-size:9px;letter-spacing:2px;color:#7e7e7e;font-weight:700;margin-bottom:6px">THREAT ACTORS</div><div style="font-size:11px;color:#bbb">${(res.threat_actors||[]).join(', ')||'Unknown'}</div></div>
+      </div>
+      <div style="color:#bbb;font-size:12px;line-height:1.7;margin-bottom:12px">${res.threat_assessment||''}</div>
+      ${(actions.immediate||[]).length?`<div style="font-size:9px;letter-spacing:2px;color:#0066b1;font-weight:700;margin-bottom:6px">IMMEDIATE ACTIONS</div><ul style="color:#bbb;font-size:11px;line-height:1.9;padding-left:16px">${(actions.immediate||[]).map(s=>`<li>${s}</li>`).join('')}</ul>`:''}
+    `;
+  }
+}
+
+// ── Incidents Full ───────────────────────────────────────────────────────────
+async function loadIncidentsFull(){
+  const data = await fetch('/api/incidents').then(r=>r.json()).catch(()=>[]);
+  const el = document.getElementById('incidentsFull');
+  const demo = [
+    {id:'INC-2024-0089',title:'Ransomware Outbreak — Finance Department',severity:'CRITICAL',status:'OPEN',analyst:'Alice Chen',created_at:'2024-01-15 08:24',incident_type:'Ransomware'},
+    {id:'INC-2024-0088',title:'APT Lateral Movement Campaign',severity:'HIGH',status:'INVESTIGATING',analyst:'Bob Martinez',created_at:'2024-01-15 08:12',incident_type:'APT'},
+    {id:'INC-2024-0087',title:'Phishing — Executive Impersonation',severity:'MEDIUM',status:'CONTAINED',analyst:'Clara Singh',created_at:'2024-01-15 07:55',incident_type:'Phishing'},
+  ];
+  const list = data.length?data:demo;
+  el.innerHTML = `<div class="table"><table>
+    <thead><tr><th>ID</th><th>TITLE</th><th>TYPE</th><th>SEVERITY</th><th>STATUS</th><th>ANALYST</th><th>CREATED</th></tr></thead>
+    <tbody>${list.map(i=>`<tr>
+      <td><span style="font-family:monospace;font-size:10px;color:#0066b1">${i.id}</span></td>
+      <td><span class="title" style="max-width:280px">${i.title}</span></td>
+      <td><span style="font-size:10px;color:#7e7e7e">${i.incident_type||'General'}</span></td>
+      <td><span class="badge ${i.severity}">${i.severity}</span></td>
+      <td><span class="badge ${i.status}">${i.status}</span></td>
+      <td><span style="font-size:11px">${i.analyst||'Unassigned'}</span></td>
+      <td><span style="font-size:10px;color:#7e7e7e">${(i.created_at||'').slice(0,16)}</span></td>
+    </tr>`).join('')}</tbody>
+  </table></div>`;
+}
+function openCreateIncident(){
+  const title = prompt('Incident title:');
+  if(!title) return;
+  const sev = prompt('Severity (CRITICAL/HIGH/MEDIUM/LOW):','HIGH');
+  fetch('/api/incidents',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({title,severity:sev||'HIGH',analyst:'analyst'})}).then(()=>loadIncidentsFull());
+}
+
+// ── IOC Table ────────────────────────────────────────────────────────────────
+async function loadIOCTable(){
+  const data = await fetch('/api/iocs').then(r=>r.json()).catch(()=>[]);
+  document.getElementById('iocTotal').textContent = data.length+' INDICATORS';
+  const demo=[{ioc_type:'IP',value:'185.220.101.45',threat_actor:'DarkSide',campaign:'Ransomware-2024',confidence:95,tlp:'RED'},{ioc_type:'IP',value:'91.234.55.112',threat_actor:'APT28',campaign:'Operation Bear',confidence:90,tlp:'AMBER'},{ioc_type:'DOMAIN',value:'c2-beacon.xyz',threat_actor:'Cobalt Strike',campaign:'CS-Campaign-1',confidence:97,tlp:'RED'},{ioc_type:'HASH',value:'a1b2c3d4e5f6ab12',threat_actor:'Unknown',campaign:'Dropper-v3',confidence:80,tlp:'WHITE'},{ioc_type:'EMAIL',value:'spoof@phish.ru',threat_actor:'Fancy Bear',campaign:'PhishOps',confidence:92,tlp:'AMBER'},{ioc_type:'URL',value:'http://evil.ru/payload.exe',threat_actor:'Lazarus',campaign:'NK-Ops',confidence:88,tlp:'RED'}];
+  const list = data.length?data:demo;
+  document.getElementById('iocTable').innerHTML=`<div class="table"><table>
+    <thead><tr><th>TYPE</th><th>VALUE</th><th>THREAT ACTOR</th><th>CAMPAIGN</th><th>CONFIDENCE</th><th>TLP</th></tr></thead>
+    <tbody>${list.map(i=>`<tr>
+      <td><span class="badge medium">${i.ioc_type}</span></td>
+      <td><span style="font-family:monospace;font-size:11px">${i.value}</span></td>
+      <td><span style="font-size:11px;color:#bbb">${i.threat_actor||'Unknown'}</span></td>
+      <td><span style="font-size:11px;color:#7e7e7e">${i.campaign||'—'}</span></td>
+      <td><div style="display:flex;align-items:center;gap:6px"><div style="flex:1;height:3px;background:#262626"><div style="width:${i.confidence||80}%;height:100%;background:${i.confidence>85?'#e22718':i.confidence>70?'#f4b400':'#0066b1'}"></div></div><span style="font-size:10px">${i.confidence||80}%</span></div></td>
+      <td><span class="badge ${i.tlp==='RED'?'CRITICAL':i.tlp==='AMBER'?'HIGH':'LOW'}">${i.tlp||'WHITE'}</span></td>
+    </tr>`).join('')}</tbody>
+  </table></div>`;
+}
+
+// ── Asset Table ───────────────────────────────────────────────────────────────
+async function loadAssetTable(){
+  const data = await fetch('/api/assets').then(r=>r.json()).catch(()=>[]);
+  const demo=[{hostname:'DC01',ip_address:'10.0.0.1',asset_type:'Server',os:'Windows Server 2022',criticality:'CRITICAL',owner:'IT Ops',risk_score:95},{hostname:'WEB01',ip_address:'10.0.1.10',asset_type:'Server',os:'Ubuntu 22.04',criticality:'HIGH',owner:'DevOps',risk_score:72},{hostname:'DB01',ip_address:'10.0.2.5',asset_type:'Database',os:'CentOS 8',criticality:'CRITICAL',owner:'DBA',risk_score:65},{hostname:'WKS101',ip_address:'10.1.1.15',asset_type:'Workstation',os:'Windows 11',criticality:'MEDIUM',owner:'Finance',risk_score:40},{hostname:'FW01',ip_address:'192.168.1.1',asset_type:'Network',os:'Cisco ASA',criticality:'CRITICAL',owner:'NetOps',risk_score:20}];
+  const list=data.length?data:demo;
+  document.getElementById('assetTable').innerHTML=`<div class="table"><table>
+    <thead><tr><th>HOSTNAME</th><th>IP ADDRESS</th><th>TYPE</th><th>OS</th><th>CRITICALITY</th><th>OWNER</th><th>RISK SCORE</th></tr></thead>
+    <tbody>${list.map(a=>`<tr>
+      <td><strong style="font-size:12px">${a.hostname}</strong></td>
+      <td><span class="ip">${a.ip_address||'—'}</span></td>
+      <td><span style="font-size:11px;color:#7e7e7e">${a.asset_type||'—'}</span></td>
+      <td><span style="font-size:11px;color:#bbb">${a.os||'—'}</span></td>
+      <td><span class="badge ${a.criticality==='CRITICAL'?'CRITICAL':a.criticality==='HIGH'?'HIGH':'MEDIUM'}">${a.criticality||'MEDIUM'}</span></td>
+      <td><span style="font-size:11px">${a.owner||'—'}</span></td>
+      <td><div style="display:flex;align-items:center;gap:8px"><div style="flex:1;height:4px;background:#262626"><div style="width:${a.risk_score||0}%;height:100%;background:${a.risk_score>75?'#e22718':a.risk_score>50?'#f4b400':'#0fa336'}"></div></div><span style="font-size:11px;font-weight:700;color:${a.risk_score>75?'#e22718':a.risk_score>50?'#f4b400':'#0fa336'}">${a.risk_score||0}</span></div></td>
+    </tr>`).join('')}</tbody>
+  </table></div>`;
+}
+
+// ── Playbooks ─────────────────────────────────────────────────────────────────
+async function loadPlaybooks(){
+  const data = await fetch('/api/playbooks').then(r=>r.json()).catch(()=>[]);
+  const demo=[{name:'Ransomware Response',trigger_type:'ransomware',steps:['Isolate affected host','Preserve forensic image','Identify patient zero','Block C2 IPs at firewall','Notify management & CISO','Engage IR retainer','Restore from clean backup','Post-incident review & lessons learned']},{name:'Phishing Investigation',trigger_type:'phishing',steps:['Extract email headers & metadata','Sandbox all attachments','Extract IOCs (URLs, hashes, domains)','Block sender domain at email gateway','Search for other recipients','Alert users who may have clicked','Document findings & close']},{name:'Brute Force Mitigation',trigger_type:'brute_force',steps:['Block attacking source IP','Review auth logs for 72h','Check for successful logins','Force password reset on targeted accounts','Enable MFA enforcement','Review firewall ACLs']},{name:'Data Exfiltration Response',trigger_type:'data_exfil',steps:['Identify exfil channel (DNS/HTTP/email)','Block egress traffic on all vectors','Capture forensic evidence','Assess data sensitivity & volume','Notify DPO and Legal','Engage CISO','Draft breach notification if required']}];
+  const list=data.length?data:demo;
+  document.getElementById('playbookCards').innerHTML=list.map(pb=>`
+    <div style="background:#1a1a1a;padding:24px">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:16px">
+        <h3 style="font-size:14px;font-weight:700;letter-spacing:1px;text-transform:uppercase">${pb.name}</h3>
+        <span class="badge medium">${(pb.trigger_type||'general').toUpperCase()}</span>
+      </div>
+      <ol style="color:#bbb;font-size:12px;line-height:2;padding-left:16px">
+        ${(pb.steps||[]).map(s=>`<li>${s}</li>`).join('')}
+      </ol>
+      <button onclick="alert('Playbook activated: ${pb.name}')" style="margin-top:16px;background:var(--bl);color:#fff;border:none;padding:8px 16px;font-size:9px;font-weight:700;letter-spacing:2px;cursor:pointer;text-transform:uppercase">ACTIVATE PLAYBOOK</button>
+    </div>`).join('');
+}
+
+// ── Quick Playbooks (AI section) ──────────────────────────────────────────────
+async function loadQuickPlaybooks(){
+  const types=['Ransomware','Phishing','Brute Force','Data Exfil'];
+  document.getElementById('quickPlaybooks').innerHTML=types.map(t=>`<button onclick="loadPlaybookAI('${t}')" style="display:block;width:100%;text-align:left;background:var(--s3);border:1px solid #3c3c3c;color:#bbb;padding:8px 12px;font-size:11px;cursor:pointer;margin-bottom:4px;transition:all .15s" onmouseover="this.style.borderColor='#0066b1';this.style.color='#fff'" onmouseout="this.style.borderColor='#3c3c3c';this.style.color='#bbb'">${t} Response Playbook →</button>`).join('');
+}
+async function loadPlaybookAI(type){
+  const res=await fetch('/api/ai/playbook',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({type})}).then(r=>r.json()).catch(()=>null);
+  if(res) document.getElementById('chat2').innerHTML+=`<div class="chat-msg ai"><strong>${res.name}</strong><ol style="padding-left:16px;margin-top:8px;line-height:2">${(res.steps||[]).map(s=>`<li>${s}</li>`).join('')}</ol></div>`;
+  document.getElementById('chat2').scrollTop=9999;
+}
+
+// ── IOC Extractor ─────────────────────────────────────────────────────────────
+async function extractIOCs(){
+  const text=document.getElementById('iocInput').value.trim();
+  if(!text){alert('Paste some text first');return;}
+  const res=await fetch('/api/ai/ioc-extract',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({text})}).then(r=>r.json()).catch(()=>({iocs:[]}));
+  const el=document.getElementById('iocExtracted');
+  if(!res.iocs.length){el.innerHTML='<p style="color:#7e7e7e;font-size:11px">No IOCs found.</p>';return;}
+  el.innerHTML=`<div style="font-size:9px;letter-spacing:2px;color:#0066b1;font-weight:700;margin-bottom:8px">${res.iocs.length} IOCs EXTRACTED</div>`+res.iocs.map(i=>`<div class="ioc-row"><span class="ioc-type">${i.type}</span><span class="ioc-val">${i.value}</span></div>`).join('');
+}
+
+// ── SIEM ──────────────────────────────────────────────────────────────────────
+async function runSIEMQuery(){
+  const q=document.getElementById('siemQuery').value.trim();
+  const el=document.getElementById('siemResults');
+  el.textContent='Running query...';
+  const res=await fetch('/api/siem/logs?limit=10').then(r=>r.json()).catch(()=>[]);
+  if(!res.length){el.innerHTML='['+new Date().toTimeString().slice(0,8)+'] QUERY: '+q+'
+[RESULT] Simulated log stream — no SIEM connected
+[TIP] POST to /api/siem/ingest to send real log data';return;}
+  el.innerHTML=res.map(l=>`[${l.ingested_at||''}] ${l.log_level||'INFO'} ${l.source||'syslog'} — ${l.message||''}`).join('
+');
+}
+async function testIngest(){
+  const res=await fetch('/api/siem/ingest',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({source:'test',event_type:'test',message:'Test log from SENTINEL UI',level:'INFO'})}).then(r=>r.json()).catch(()=>null);
+  document.getElementById('ingestResult').textContent=res?'✓ Ingested '+res.ingested+' log event(s)':'Ingest failed';
+}
+
+// ── AI section 2 (dedicated page) ────────────────────────────────────────────
+const history2=[];
+async function askAI2(){
+  const inp=document.getElementById('ask2');
+  const msg=inp.value.trim();if(!msg)return;inp.value='';
+  const c=document.getElementById('chat2');
+  c.innerHTML+=`<div class="chat-msg user">${msg}</div>`;
+  c.scrollTop=9999;
+  history2.push({role:'user',content:msg});
+  const res=await fetch('/api/ai/chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({message:msg,history:history2.slice(-6)})}).then(r=>r.json()).catch(()=>({reply:'AI unavailable.'}));
+  c.innerHTML+=`<div class="chat-msg ai">${(res.reply||'').replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>').replace(/`([^`]+)`/g,'<code style="background:#262626;padding:1px 4px;font-family:monospace">$1</code>').replace(/
+/g,'<br>')}</div>`;
+  c.scrollTop=9999;
+  history2.push({role:'assistant',content:res.reply});
+}
+document.getElementById('ask2').addEventListener('keydown',e=>{if(e.key==='Enter')askAI2();});
+function clearChat(){document.getElementById('chat2').innerHTML='';history2.length=0;}
+</script>
+</body>
+</html>
